@@ -11,7 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::create('disciplinas', function (Blueprint $table) {
+            $table->id();
+            $table->string('nome');
+            $table->integer('carga_horaria');
+            
+            // Chave estrangeira para ligar com a tabela de cursos
+            // O constrained() entende automaticamente que a tabela é 'cursos'
+            $table->foreignId('curso_id')->constrained()->onDelete('cascade');
+            
+            $table->timestamps();
+        });
     }
 
     /**
@@ -19,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('disciplinas');
     }
 };

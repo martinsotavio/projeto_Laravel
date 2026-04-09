@@ -2,63 +2,64 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Aluno;
 use Illuminate\Http\Request;
 
 class AlunoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $alunos = Aluno::query()
+            ->latest()
+            ->get();
+
+        return view('alunos.index', compact('alunos'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('alunos.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $dados = $request->validate([
+            'nome' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:alunos,email'],
+        ]);
+
+        Aluno::create($dados);
+
+        return redirect()
+            ->route('alunos.index')
+            ->with('success', 'Aluno criado com sucesso.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Aluno $aluno)
     {
-        //
+        return view('alunos.edit', compact('aluno'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, Aluno $aluno)
     {
-        //
+        $dados = $request->validate([
+            'nome' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:alunos,email,' . $aluno->id],
+        ]);
+
+        $aluno->update($dados);
+
+        return redirect()
+            ->route('alunos.index')
+            ->with('success', 'Aluno atualizado com sucesso.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Aluno $aluno)
     {
-        //
-    }
+        $aluno->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()
+            ->route('alunos.index')
+            ->with('success', 'Aluno removido com sucesso.');
     }
 }
